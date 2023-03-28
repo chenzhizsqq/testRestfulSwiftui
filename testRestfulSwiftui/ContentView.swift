@@ -14,16 +14,66 @@ struct webSiteApiTestViewPost: Decodable, Identifiable {
     let body: String
 }
 
+struct GetFlowDataItem: Decodable, Identifiable {
+    let id: Int
+    let firstName: String
+    let lastName: String
+    let emailId: String
+}
+
 struct ContentView: View {
-       
+    
+    @State private var errorMessage: String = ""
+    @State private var isShowingAlert: Bool = false
+    
     var body: some View {
-        webSiteApiTestView()
+        viewJsonGetAll()
     }
     
     //这是自己的一个接口
-    func selfRESTfulApiView() -> some View {
-        
+    @State private var getFlowDataItem: [GetFlowDataItem] = []
+    func requestGetAll() {
+         AF.request("http://192.168.1.3:8080/api/v1/employees",method: .get)
+            .validate()
+            .responseDecodable(of: [GetFlowDataItem].self) { response in
+                switch response.result {
+                case .success:
+                    guard let gets = response.value else { return }
+                    self.getFlowDataItem = gets
+                case let .failure(error):
+                    print("Error: \(error)")
+                    self.errorMessage = error.localizedDescription
+                    self.isShowingAlert = true
+                }
+        }
+    }
+    
+    //获取json get all
+    func viewJsonGetAll() -> some View {
         ZStack {
+            
+            VStack {
+                List(getFlowDataItem, id: \.id) { get in
+                    VStack(alignment: .leading) {
+                        Text(String(get.id))
+                            .font(.headline)
+                        Text(get.firstName)
+                        Text(get.lastName)
+                        Text(get.emailId)
+                    }
+                }
+                Button(action: {
+                    requestGetAll()
+                }, label: {
+                    Text("接收GET ALL")
+                })
+            }
+            .onAppear(){
+                requestGetAll()
+            }
+            .alert(isPresented: $isShowingAlert) {
+                Alert(title: Text("Error"), message: Text(errorMessage), dismissButton: .default(Text("OK")))
+            }
         }
     }
     
