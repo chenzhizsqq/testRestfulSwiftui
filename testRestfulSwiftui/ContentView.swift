@@ -8,12 +8,14 @@
 import SwiftUI
 import Alamofire
 
+//网上接口的数据结构
 struct webSiteApiTestViewPost: Decodable, Identifiable {
     let id: Int
     let title: String
     let body: String
 }
 
+//自己接口的数据结构
 struct GetFlowDataItem: Decodable, Identifiable {
     let id: Int
     let firstName: String
@@ -27,7 +29,11 @@ struct ContentView: View {
     @State private var isShowingAlert: Bool = false
     
     var body: some View {
+        //对应自己做的一个接口
         viewJsonGetAll()
+        
+        //对应网上的一个接口
+        webSiteApiTestView()
     }
     
     //这是自己的一个接口
@@ -48,7 +54,7 @@ struct ContentView: View {
         }
     }
     
-    //获取json get all
+    //获取自己接口的json get all
     func viewJsonGetAll() -> some View {
         ZStack {
             
@@ -80,6 +86,7 @@ struct ContentView: View {
     
     //这是网上的一个接口
     @State private var posts: [webSiteApiTestViewPost] = []
+    //获取网上接口的数据
     func webSiteApiTestView() -> some View {
         
         ZStack {
